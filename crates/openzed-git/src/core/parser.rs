@@ -3,7 +3,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TaskEntry {
     pub label: String,
     pub command: String,
@@ -16,7 +16,7 @@ pub struct TaskEntry {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZedTasks {
-    #[serde(default)]
+    #[serde(rename = "tasks")]
     pub tasks: Vec<TaskEntry>,
 }
 
@@ -25,16 +25,19 @@ impl ZedTasks {
         if path.exists() {
             let content = fs::read_to_string(path)?;
             let trimmed = content.trim();
-            // Try parsing as ZedTasks object first
-            if let Ok(zed_tasks) = serde_json::from_str::<ZedTasks>(trimmed) {
-                return Ok(zed_tasks);
-            }
-            // If that fails, try parsing as direct array
+
+            // Try parsing as direct array first
             if trimmed.starts_with('[') {
                 let tasks: Vec<TaskEntry> = serde_json::from_str(trimmed)
                     .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
                 return Ok(Self { tasks });
             }
+
+            // Try parsing as {"tasks": [...]} wrapper
+            if let Ok(zed_tasks) = serde_json::from_str::<ZedTasks>(trimmed) {
+                return Ok(zed_tasks);
+            }
+
             // Otherwise return empty
             Ok(Self { tasks: vec![] })
         } else {
@@ -43,7 +46,8 @@ impl ZedTasks {
     }
 
     pub fn save(&self, path: &Path) -> Result<(), io::Error> {
-        let content = serde_json::to_string_pretty(self)
+        // Save as direct array (Zed expects array format)
+        let content = serde_json::to_string_pretty(&self.tasks)
             .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         fs::write(path, content)
     }

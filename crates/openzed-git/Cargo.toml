@@ -1,13 +1,13 @@
 [package]
 name = "openzed-git"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 description = "Extra Git tools for Zed through a Rust CLI and Zed Tasks integration."
 license = "MIT"
-repository = "https://github.com/your-username/openzed-git"
+repository = "https://github.com/aswin402/openzed-git"
 keywords = ["git", "zed", "github", "cli"]
 categories = ["utility", "development-tools"]
-authors = ["Your Name"]
+authors = ["Aswin"]
 
 [[bin]]
 name = "openzed-git"
