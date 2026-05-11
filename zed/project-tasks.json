@@ -1,0 +1,93 @@
+[
+  {
+    "label": "OpenZed Git: Publish to GitHub",
+    "command": "openzed-git publish",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Git Graph",
+    "command": "openzed-git graph",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Status+",
+    "command": "openzed-git status-plus",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Commit + Push",
+    "command": "openzed-git commit-push",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Push / Set Upstream",
+    "command": "openzed-git push",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Pull",
+    "command": "openzed-git pull",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Branches",
+    "command": "openzed-git branches",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Remotes",
+    "command": "openzed-git remotes",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Setup Remote",
+    "command": "openzed-git setup-remote",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Rename Branch",
+    "command": "openzed-git rename-branch",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Set Upstream",
+    "command": "openzed-git set-upstream",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Open GitHub Repo",
+    "command": "openzed-git open-github",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Doctor",
+    "command": "openzed-git doctor",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  }
+]

@@ -1,0 +1,7 @@
+id = "openzed-git"
+name = "OpenZed Git"
+version = "0.1.0"
+schema_version = 1
+authors = ["Your Name"]
+description = "Extra Git tools for Zed: Publish to GitHub, Git Graph, remotes, upstream setup, and Git doctor."
+repository = "https://github.com/your-username/openzed-git"

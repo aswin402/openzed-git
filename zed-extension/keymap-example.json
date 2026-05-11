@@ -1,0 +1,10 @@
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-alt-g p": ["task::Spawn", { "task_name": "OpenZed Git: Publish to GitHub" }],
+      "cmd-alt-g g": ["task::Spawn", { "task_name": "OpenZed Git: Git Graph" }],
+      "cmd-alt-g d": ["task::Spawn", { "task_name": "OpenZed Git: Doctor" }]
+    }
+  }
+]
