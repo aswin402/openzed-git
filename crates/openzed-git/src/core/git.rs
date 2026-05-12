@@ -229,18 +229,26 @@ impl GitInfo {
     }
 
     pub fn log_simple() -> Result<String> {
+        // Format: hash<tab>date<tab>ref<tab>message
         let output = Command::new("git")
-            .args(["log", "--oneline", "-15", "--decorate", "--date=relative"])
+            .args([
+                "log",
+                "--oneline",
+                "-15",
+                "--decorate",
+                "--date=short",
+                "--pretty=format:%h%x09%ad%x09%D%x09%s",
+            ])
             .output()
             .context("Failed to get git log")?;
 
         if !output.status.success() {
-            return Ok("No commits yet".to_string());
+            return Ok(String::from_utf8_lossy(&output.stdout).to_string());
         }
 
         let output = String::from_utf8_lossy(&output.stdout);
-
         let lines: Vec<&str> = output.lines().collect();
+
         if lines.is_empty() {
             return Ok("No commits yet".to_string());
         }
@@ -248,14 +256,123 @@ impl GitInfo {
         let mut result = String::new();
 
         for (i, line) in lines.iter().enumerate() {
-            if i == 0 {
-                result.push_str(&format!("  \x1b[38;2;0;255;135m•\x1b[0m {}\n", line));
+            // Split by tab: hash | date | refs | message
+            let parts: Vec<&str> = line.splitn(4, '\t').collect();
+
+            let (graph_sym, hash, date, refs, msg) = if parts.len() >= 4 {
+                (
+                    if i == 0 {
+                        "\x1b[38;2;99;209;169m●\x1b[0m"
+                    } else {
+                        "\x1b[38;2;99;209;169m│\x1b[0m"
+                    },
+                    parts[0], // hash
+                    parts[1], // date
+                    parts[2], // refs (can be empty)
+                    parts[3], // message
+                )
+            } else if parts.len() == 3 {
+                (
+                    if i == 0 {
+                        "\x1b[38;2;99;209;169m●\x1b[0m"
+                    } else {
+                        "\x1b[38;2;99;209;169m│\x1b[0m"
+                    },
+                    parts[0],
+                    parts[1],
+                    "",
+                    parts[2],
+                )
+            } else if parts.len() == 2 {
+                (
+                    if i == 0 {
+                        "\x1b[38;2;99;209;169m●\x1b[0m"
+                    } else {
+                        "\x1b[38;2;99;209;169m│\x1b[0m"
+                    },
+                    parts[0],
+                    "",
+                    "",
+                    parts[1],
+                )
             } else {
-                result.push_str(&format!("  \x1b[38;2;80;80;80m│\x1b[0m {}\n", line));
+                result.push_str(line);
+                result.push('\n');
+                continue;
+            };
+
+            // Format: ● hash  date  refs  message
+            // Colors:  cyan  cyan  gray  purple/yellow  text
+            result.push_str("  ");
+            result.push_str(graph_sym);
+            result.push_str(" ");
+
+            // Hash in cyan
+            result.push_str("\x1b[38;2;99;209;169m");
+            result.push_str(hash);
+            result.push_str("\x1b[0m ");
+
+            // Date in muted gray
+            if !date.is_empty() {
+                result.push_str("\x1b[38;2;98;114;164m");
+                result.push_str(date);
+                result.push_str("\x1b[0m  ");
+            } else {
+                result.push_str("        ");
             }
+
+            // Refs in purple/yellow
+            if !refs.is_empty() {
+                // Color branch names and refs
+                let colored_refs = Self::color_branch_names(refs);
+
+                result.push_str(&colored_refs);
+                result.push_str("  ");
+            }
+
+            // Message in white/text
+            result.push_str("\x1b[38;2;248;248;242m");
+            result.push_str(msg);
+            result.push_str("\x1b[0m");
+
+            result.push('\n');
         }
 
         Ok(result.trim_end().to_string())
+    }
+
+    /// Color branch names in refs purple
+    fn color_branch_names(refs: &str) -> String {
+        let mut result = refs.to_string();
+
+        // First, replace arrows and separators with colored versions
+        const ARROW: &str = "\x1b[38;2;255;113;231m→\x1b[0m";
+        result = result.replace(" -> ", &format!(" {} ", ARROW));
+        result = result.replace(", ", &format!(",\x1b[0m "));
+
+        // Color HEAD in yellow
+        result = result.replace("HEAD", &format!("\x1b[38;2;255;228;106mHEAD\x1b[0m"));
+
+        // Split by commas and color each branch name
+        let parts: Vec<&str> = result.split(',').collect();
+        let mut colored = Vec::new();
+
+        for part in parts {
+            let part = part.trim();
+            if part.is_empty() {
+                continue;
+            }
+
+            // Check if this part is already colored (has ANSI codes)
+            if part.contains("\x1b[") {
+                colored.push(part.to_string());
+            } else {
+                // Color branch name in purple
+                colored.push(format!("\x1b[38;2;162;119;255m{}\x1b[0m", part));
+            }
+        }
+
+        colored.join(", ")
     }
 
     pub fn branches() -> Result<String> {

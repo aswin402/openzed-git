@@ -1,8 +1,9 @@
 use crate::core::git::GitInfo;
 use crate::core::github::GithubInfo;
 use crate::core::shell::confirm;
+use crate::ui::aura::aura::{CHECK, CROSS, CYAN, GREEN, RED, TEXT_DIM, TEXT_MUTED};
 use crate::ui::aura::separator;
-use crate::ui::aura::aura::{CHECK, CROSS};
+use crate::ui::aura::{error_msg, link, success, warning_msg};
 use crate::ui::prompts::input_with_default;
 use anyhow::Result;
 
@@ -12,14 +13,20 @@ pub fn run() -> Result<()> {
     let cwd = std::env::current_dir()?;
 
     // Check if git repo, auto-init if not
-    print!("  Checking git... ");
+    print!("  Checking Git... ");
     if GitInfo::is_repo().is_ok() {
-        println!("{}", CHECK);
+        print!(" ");
+        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        println!();
     } else {
-        println!("{}", CROSS);
+        print!(" ");
+        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        println!();
         print!("  Initializing Git repository... ");
         GitInfo::init()?;
-        println!("{}", CHECK);
+        print!(" ");
+        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        println!();
     }
 
     let info = GitInfo::get()?;
@@ -49,7 +56,7 @@ pub fn run() -> Result<()> {
             let message: String = input_with_default("Initial commit message:", "initial commit")?;
             GitInfo::add_all()?;
             GitInfo::commit(&message)?;
-            println!("  {} Initial commit created", CHECK);
+            success("Initial commit created");
         }
     }
 
@@ -57,24 +64,37 @@ pub fn run() -> Result<()> {
     println!();
     print!("  Checking GitHub CLI... ");
     if GithubInfo::is_installed().unwrap_or(false) {
-        println!("{}", CHECK);
-    } else {
-        println!("{}", CROSS);
+        print!(" ");
+        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
         println!();
-        println!("  GitHub CLI is not installed.");
-        println!("  Install it from: https://cli.github.com/");
-        println!("  Then run: gh auth login");
+    } else {
+        print!(" ");
+        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        println!();
+        error_msg("GitHub CLI is not installed.");
+        print!("    ");
+        crate::ui::aura::aura_text("Install it from:", TEXT_MUTED);
+        print!(" ");
+        crate::ui::aura::aura_text("https://cli.github.com/", CYAN);
+        println!();
         return Ok(());
     }
 
     print!("  Checking GitHub authentication... ");
     if GithubInfo::is_authenticated().unwrap_or(false) {
-        println!("{}", CHECK);
-    } else {
-        println!("{}", CROSS);
+        print!(" ");
+        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
         println!();
-        println!("  GitHub CLI is not authenticated.");
-        println!("  Run: gh auth login");
+    } else {
+        print!(" ");
+        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        println!();
+        error_msg("GitHub CLI is not authenticated.");
+        print!("    ");
+        crate::ui::aura::aura_text("Run:", TEXT_MUTED);
+        print!(" ");
+        crate::ui::aura::aura_text("gh auth login", CYAN);
+        println!();
         return Ok(());
     }
 
@@ -99,8 +119,10 @@ pub fn run() -> Result<()> {
     // Check if remote exists
     if info.remote_origin.is_some() {
         println!();
-        println!("  Remote origin already exists:");
-        println!("    {}", info.remote_origin.as_ref().unwrap());
+        warning_msg("Remote origin already exists");
+        print!("    ");
+        crate::ui::aura::aura_text(&info.remote_origin.as_ref().unwrap(), TEXT_DIM);
+        println!();
         let choice = dialoguer::Select::new()
             .with_prompt("What do you want to do?")
             .items(&["Use existing remote and push", "Cancel"])
@@ -108,7 +130,9 @@ pub fn run() -> Result<()> {
             .interact()?;
 
         if choice == 1 {
-            println!("  Cancelled.");
+            print!("  ");
+            crate::ui::aura::aura_text("Cancelled.", TEXT_MUTED);
+            println!();
             return Ok(());
         }
     } else {
@@ -116,24 +140,32 @@ pub fn run() -> Result<()> {
         println!();
         print!("  Creating repository on GitHub... ");
         GithubInfo::create_repo(&name, Some(&description), public, &cwd)?;
-        println!("{}", CHECK);
+        print!(" ");
+        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        println!();
     }
 
-    // Push - already done by gh create --push
+    // Push
     println!();
-    println!("{} Pushed to GitHub", CHECK);
+    print!("  Setting remote origin... ");
+    print!(" ");
+    crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+    println!();
+    print!("  Pushing branch... ");
+    print!(" ");
+    crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+    println!();
 
     // Show result
     println!();
-    println!("  {} Repository published successfully!", CHECK);
+    success("Repository published successfully!");
 
     // Build GitHub URL
     let remote = GitInfo::remote_origin().ok();
     let github_url = remote.and_then(|r| GithubInfo::remote_to_github_url(&r));
 
     if let Some(url) = github_url {
-        println!();
-        println!("  GitHub: {}", url);
+        link(&url);
 
         let open = confirm("Open in browser?")?;
         if open {

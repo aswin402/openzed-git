@@ -4,7 +4,7 @@ pub mod aura;
 pub mod banner;
 pub mod prompts;
 
-use crate::ui::aura::aura::{CHECK, GREEN, LAVENDER, RESET, SURFACE, TEXT_DIM};
+use crate::ui::aura::aura::{CHECK, CYAN, GREEN, RESET, SURFACE, TEXT_DIM};
 use std::io::{self, Write};
 
 /// Loading animation frames
@@ -33,7 +33,7 @@ impl Spinner {
 
     pub fn spin(&self, frame: usize) {
         let frame_str = &self.frames[frame % self.frames.len()];
-        print!("\r{} {} {}", LAVENDER, frame_str, RESET);
+        print!("\r{} {} {}", CYAN, frame_str, RESET);
         print!(" {}", self.message);
         print!("{}", " ".repeat(20));
         io::stdout().flush().ok();
