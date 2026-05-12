@@ -119,4 +119,192 @@ impl GithubInfo {
             None
         }
     }
+
+    pub fn ensure_gh_ready() -> Result<()> {
+        if !Self::is_installed()? {
+            anyhow::bail!("GitHub CLI is not installed");
+        }
+        if !Self::is_authenticated()? {
+            anyhow::bail!("GitHub CLI is not authenticated");
+        }
+        Ok(())
+    }
+
+    pub fn pr_list() -> Result<Vec<PullRequest>> {
+        let output = Command::new("gh")
+            .args([
+                "pr",
+                "list",
+                "--limit",
+                "20",
+                "--json",
+                "number,title,headRefName,baseRefName,state,isDraft,author,updatedAt,url",
+            ])
+            .output()
+            .context("Failed to list PRs")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to list PRs: {}", stderr.trim())
+        }
+
+        let json: Vec<serde_json::Value> =
+            serde_json::from_slice(&output.stdout).context("Failed to parse PR list response")?;
+
+        let prs: Vec<PullRequest> = json
+            .into_iter()
+            .map(|pr| PullRequest {
+                number: pr["number"].as_u64().unwrap_or(0) as u32,
+                title: pr["title"].as_str().unwrap_or("").to_string(),
+                head: pr["headRefName"].as_str().unwrap_or("").to_string(),
+                base: pr["baseRefName"].as_str().unwrap_or("").to_string(),
+                state: pr["state"].as_str().unwrap_or("").to_string(),
+                is_draft: pr["isDraft"].as_bool().unwrap_or(false),
+                author: pr["author"]["login"]
+                    .as_str()
+                    .unwrap_or("unknown")
+                    .to_string(),
+                updated_at: pr["updatedAt"].as_str().unwrap_or("").to_string(),
+                url: pr["url"].as_str().unwrap_or("").to_string(),
+            })
+            .collect();
+
+        Ok(prs)
+    }
+
+    pub fn pr_create(
+        base: &str,
+        head: &str,
+        title: &str,
+        body: Option<&str>,
+        draft: bool,
+    ) -> Result<String> {
+        let mut args = vec![
+            "pr", "create", "--base", base, "--head", head, "--title", title,
+        ];
+
+        if let Some(b) = body {
+            if !b.is_empty() {
+                args.extend(["--body", b]);
+            }
+        }
+
+        if draft {
+            args.push("--draft");
+        }
+
+        let output = Command::new("gh")
+            .args(&args)
+            .output()
+            .context("Failed to create PR")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to create PR: {}", stderr.trim())
+        }
+
+        // PR URL is usually in stdout
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let url = stdout.trim();
+        Ok(url.to_string())
+    }
+
+    pub fn pr_checkout(number: u32) -> Result<()> {
+        let output = Command::new("gh")
+            .args(["pr", "checkout", &number.to_string()])
+            .output()
+            .context("Failed to checkout PR")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to checkout PR: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn pr_view_web(number: u32) -> Result<()> {
+        let output = Command::new("gh")
+            .args(["pr", "view", &number.to_string(), "--web"])
+            .output()
+            .context("Failed to open PR in browser")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to open PR: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn pr_view_web_current() -> Result<()> {
+        let output = Command::new("gh")
+            .args(["pr", "view", "--web"])
+            .output()
+            .context("Failed to open PR in browser")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to open PR: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn current_pr_url() -> Result<Option<String>> {
+        let output = Command::new("gh")
+            .args(["pr", "view", "--json", "url"])
+            .output()
+            .context("Failed to get current PR")?;
+
+        if !output.status.success() {
+            return Ok(None);
+        }
+
+        let json: serde_json::Value =
+            serde_json::from_slice(&output.stdout).context("Failed to parse PR response")?;
+
+        let url = json["url"].as_str().unwrap_or("").to_string();
+        if url.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(url))
+        }
+    }
+
+    pub fn push_current_branch() -> Result<()> {
+        let output = Command::new("git")
+            .args(["push", "-u", "origin", "HEAD"])
+            .output()
+            .context("Failed to push current branch")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to push: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn has_upstream() -> Result<bool> {
+        let output = Command::new("git")
+            .args(["rev-parse", "--abbrev-ref", "@{upstream}"])
+            .output()
+            .context("Failed to check upstream")?;
+
+        Ok(output.status.success())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PullRequest {
+    pub number: u32,
+    pub title: String,
+    pub head: String,
+    pub base: String,
+    pub state: String,
+    pub is_draft: bool,
+    pub author: String,
+    pub updated_at: String,
+    pub url: String,
 }

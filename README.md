@@ -10,22 +10,30 @@ OpenZed Git adds missing Git features to Zed through a Rust CLI and Zed Tasks in
 
 ## Features
 
-| Command | Description |
-|---------|-------------|
-| `publish` | Publish local project to GitHub |
-| `graph` | Show Git graph / commit history |
-| `status-plus` | Show richer Git status |
-| `commit-push` | Commit staged files and push |
-| `push` | Push and optionally set upstream |
-| `pull` | Pull from remote |
-| `branches` | List branches |
-| `remotes` | List remotes |
-| `setup-remote` | Setup remote origin |
-| `rename-branch` | Rename current branch |
-| `set-upstream` | Set upstream branch |
-| `doctor` | Check Git setup and configuration |
-| `open-github` | Open GitHub repository in browser |
-| `install-zed-tasks` | Install OpenZed Git tasks in Zed |
+| Command | Status | Description |
+|---|---|---|
+| `publish` | ✅ Done | Publish local project to GitHub |
+| `graph` | ✅ Done | Show Git graph / commit history |
+| `status-plus` | ✅ Done | Show richer Git status |
+| `commit-push` | ✅ Done | Commit staged files and push |
+| `push` | ✅ Done | Push and optionally set upstream |
+| `pull` | ✅ Done | Pull from remote |
+| `branches` | ✅ Done | List branches |
+| `remotes` | ✅ Done | List remotes |
+| `setup-remote` | ✅ Done | Setup remote origin |
+| `rename-branch` | ✅ Done | Rename current branch |
+| `set-upstream` | ✅ Done | Set upstream branch |
+| `doctor` | ✅ Done | Check Git setup and configuration |
+| `open-github` | ✅ Done | Open GitHub repository in browser |
+| `install-zed-tasks` | ✅ Done | Install OpenZed Git tasks in Zed |
+| `stash` | ✅ Done | Manage Git stashes (save/list/apply/pop/drop) |
+| `switch` | ✅ Done | Switch branches interactively |
+| `conflicts` | ✅ Done | Help resolve merge conflicts |
+| `rebase-helper` | ✅ Done | Help with Git rebase operations |
+| `menu` | ✅ Done | Central interactive menu |
+| `config` | ✅ Done | Manage global/project config |
+| `theme` | ✅ Done | Theme listing and preview |
+| `install-keybindings` | ✅ Done | Install Zed keybindings |
 
 ## Quick Start
 
@@ -94,39 +102,84 @@ openzed-git install-zed-tasks
 - `OpenZed Git: Set Upstream`
 - `OpenZed Git: Open GitHub Repo`
 - `OpenZed Git: Doctor`
+- `OpenZed Git: Stash`
+- `OpenZed Git: Branch Switcher`
+- `OpenZed Git: Undo Last Commit`
+- `OpenZed Git: Commit Assistant`
+- `OpenZed Git: Create Pull Request`
+- `OpenZed Git: List Pull Requests`
+- `OpenZed Git: Checkout Pull Request`
+- `OpenZed Git: Open Pull Request`
+- `OpenZed Git: Conflict Helper`
+- `OpenZed Git: Rebase Helper`
+- `OpenZed Git: Menu`
+- `OpenZed Git: Config`
+- `OpenZed Git: Theme`
+- `OpenZed Git: Install Keybindings`
 
-## How It Works
+## Configuration
 
+OpenZed Git supports configuration files:
+
+- **Global config:** `~/.config/openzed-git/config.toml`
+- **Project config:** `.openzed-git.toml` (overrides global)
+
+Create and manage with:
+```bash
+openzed-git config
 ```
-Zed extension / task provider
-        ↓
-OpenZed Git tasks appear in Zed task list
-        ↓
-User selects task
-        ↓
-Zed terminal opens
-        ↓
-Rust binary runs focused flow
+
+## Keybindings
+
+Install Zed keybindings for quick access:
+```bash
+openzed-git install-keybindings
 ```
 
-## Safety Rules
+Suggested bindings (cmd-alt-g prefix):
+- `cmd-alt-g m` - Menu
+- `cmd-alt-g s` - Status+
+- `cmd-alt-g g` - Git Graph
+- `cmd-alt-g c` - Commit Assistant
+- `cmd-alt-g p` - Publish to GitHub
+- `cmd-alt-g r` - Pull Requests
 
-- Never force pushes
-- Never deletes branches
-- Never overwrites remote origin automatically
-- Always asks for confirmation before destructive operations
+## Error Logs
 
-## Requirements
+OpenZed Git shows friendly TUI error notifications and saves detailed logs to:
 
-- Git
-- GitHub CLI (`gh`) for publish feature
-- Zed (for extension integration)
+```text
+.openzed-git/gitlogerror.md
+```
+
+Fallback:
+
+```text
+~/.config/openzed-git/gitlogerror.md
+```
+
+Error logs include command, error type, message, and git context for debugging.
+
+## Screenshots
+
+### Publish to GitHub
+<img src="assets/screenshots/publish.png" alt="Publish to GitHub" />
+
+### Git Graph
+<img src="assets/screenshots/graph.png" alt="Git Graph" />
+
+### Status+
+<img src="assets/screenshots/status-plus.png" alt="Status Plus" />
 
 ## Documentation
 
 - [Zed Integration](docs/zed-integration.md)
 - [Zed Tasks Setup](docs/zed-tasks-setup.md)
+- [Commands Reference](docs/commands.md)
+- [Aura Dark Theme](docs/theme.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Safety Rules](docs/safety.md)
+- [Configuration (Future)](docs/config.md)
 - [Roadmap](docs/roadmap.md)
 
 ## License

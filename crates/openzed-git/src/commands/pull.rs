@@ -1,6 +1,6 @@
 use crate::core::git::GitInfo;
-use crate::ui::aura::separator;
 use crate::ui::aura::aura::{CHECK, WARNING};
+use crate::ui::aura::separator;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {

@@ -2,6 +2,7 @@
 
 pub mod aura;
 pub mod banner;
+pub mod notifications;
 pub mod prompts;
 
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, RESET, SURFACE, TEXT_DIM};

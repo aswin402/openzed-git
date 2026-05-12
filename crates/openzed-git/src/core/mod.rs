@@ -1,3 +1,5 @@
+pub mod config;
+pub mod error_logger;
 pub mod errors;
 pub mod git;
 pub mod github;

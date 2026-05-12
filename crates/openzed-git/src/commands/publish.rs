@@ -3,7 +3,7 @@ use crate::core::github::GithubInfo;
 use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CROSS, CYAN, GREEN, RED, TEXT_DIM, TEXT_MUTED};
 use crate::ui::aura::separator;
-use crate::ui::aura::{error_msg, link, success, warning_msg};
+use crate::ui::aura::{aura_text, error_msg, link, success, warning_msg};
 use crate::ui::prompts::input_with_default;
 use anyhow::Result;
 
@@ -16,16 +16,16 @@ pub fn run() -> Result<()> {
     print!("  Checking Git... ");
     if GitInfo::is_repo().is_ok() {
         print!(" ");
-        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        aura_text(CHECK.trim(), GREEN);
         println!();
     } else {
         print!(" ");
-        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        aura_text(CROSS.trim(), RED);
         println!();
         print!("  Initializing Git repository... ");
         GitInfo::init()?;
         print!(" ");
-        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        aura_text(CHECK.trim(), GREEN);
         println!();
     }
 
@@ -65,17 +65,17 @@ pub fn run() -> Result<()> {
     print!("  Checking GitHub CLI... ");
     if GithubInfo::is_installed().unwrap_or(false) {
         print!(" ");
-        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        aura_text(CHECK.trim(), GREEN);
         println!();
     } else {
         print!(" ");
-        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        aura_text(CROSS.trim(), RED);
         println!();
         error_msg("GitHub CLI is not installed.");
         print!("    ");
-        crate::ui::aura::aura_text("Install it from:", TEXT_MUTED);
+        aura_text("Install it from:", TEXT_MUTED);
         print!(" ");
-        crate::ui::aura::aura_text("https://cli.github.com/", CYAN);
+        aura_text("https://cli.github.com/", CYAN);
         println!();
         return Ok(());
     }
@@ -83,17 +83,17 @@ pub fn run() -> Result<()> {
     print!("  Checking GitHub authentication... ");
     if GithubInfo::is_authenticated().unwrap_or(false) {
         print!(" ");
-        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        aura_text(CHECK.trim(), GREEN);
         println!();
     } else {
         print!(" ");
-        crate::ui::aura::aura_text(CROSS.trim(), RED);
+        aura_text(CROSS.trim(), RED);
         println!();
         error_msg("GitHub CLI is not authenticated.");
         print!("    ");
-        crate::ui::aura::aura_text("Run:", TEXT_MUTED);
+        aura_text("Run:", TEXT_MUTED);
         print!(" ");
-        crate::ui::aura::aura_text("gh auth login", CYAN);
+        aura_text("gh auth login", CYAN);
         println!();
         return Ok(());
     }
@@ -121,7 +121,7 @@ pub fn run() -> Result<()> {
         println!();
         warning_msg("Remote origin already exists");
         print!("    ");
-        crate::ui::aura::aura_text(&info.remote_origin.as_ref().unwrap(), TEXT_DIM);
+        aura_text(&info.remote_origin.as_ref().unwrap(), TEXT_DIM);
         println!();
         let choice = dialoguer::Select::new()
             .with_prompt("What do you want to do?")
@@ -131,7 +131,7 @@ pub fn run() -> Result<()> {
 
         if choice == 1 {
             print!("  ");
-            crate::ui::aura::aura_text("Cancelled.", TEXT_MUTED);
+            aura_text("Cancelled.", TEXT_MUTED);
             println!();
             return Ok(());
         }
@@ -141,7 +141,7 @@ pub fn run() -> Result<()> {
         print!("  Creating repository on GitHub... ");
         GithubInfo::create_repo(&name, Some(&description), public, &cwd)?;
         print!(" ");
-        crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+        aura_text(CHECK.trim(), GREEN);
         println!();
     }
 
@@ -149,11 +149,11 @@ pub fn run() -> Result<()> {
     println!();
     print!("  Setting remote origin... ");
     print!(" ");
-    crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+    aura_text(CHECK.trim(), GREEN);
     println!();
     print!("  Pushing branch... ");
     print!(" ");
-    crate::ui::aura::aura_text(CHECK.trim(), GREEN);
+    aura_text(CHECK.trim(), GREEN);
     println!();
 
     // Show result

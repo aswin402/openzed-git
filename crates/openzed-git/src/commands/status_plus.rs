@@ -1,6 +1,6 @@
 use crate::core::git::GitInfo;
-use crate::ui::aura::{separator, empty, item};
-use crate::ui::aura::aura::{CHECK, WARNING, STAGED, MODIFIED, DELETED, UNTRACKED};
+use crate::ui::aura::aura::{CHECK, DELETED, MODIFIED, STAGED, UNTRACKED, WARNING};
+use crate::ui::aura::{empty, item, separator};
 use anyhow::Result;
 
 pub fn run() -> Result<()> {

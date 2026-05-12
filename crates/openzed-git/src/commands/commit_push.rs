@@ -1,7 +1,7 @@
 use crate::core::git::GitInfo;
 use crate::core::shell::confirm;
-use crate::ui::aura::separator;
 use crate::ui::aura::aura::CHECK;
+use crate::ui::aura::separator;
 use crate::ui::prompts::input_with_default;
 use anyhow::Result;
 
@@ -36,8 +36,7 @@ pub fn run() -> Result<()> {
     let message: String = input_with_default("Commit message:", "Update changes")?;
 
     // Optional body
-    let body: String =
-        input_with_default("Commit body (optional, press Enter to skip):", "")?;
+    let body: String = input_with_default("Commit body (optional, press Enter to skip):", "")?;
 
     // Commit
     print!("  Committing... ");

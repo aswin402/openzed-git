@@ -22,33 +22,31 @@ pub mod aura {
     pub const RED: &str = "\x1b[38;2;255;103;103m"; // #FF6767
     pub const WHITE: &str = "\x1b[38;2;255;255;255m"; // #FFFFFF
 
-    // Status colors
-    pub const SUCCESS: &str = "\x1b[38;2;157;255;101m"; // #9DFF65
-    pub const WARNING: &str = "\x1b[38;2;255;228;106m"; // #FFE46A
-    pub const ERROR: &str = "\x1b[38;2;255;103;103m"; // #FF6767
-    pub const INFO: &str = "\x1b[38;2;99;209;169m"; // #63D1A9
+    // Status color aliases
+    pub const WARNING: &str = "\x1b[38;2;255;228;106m"; // #FFE46A (same as YELLOW)
+    pub const SUCCESS: &str = "\x1b[38;2;157;255;101m"; // #9DFF65 (same as GREEN)
+    pub const ERROR: &str = "\x1b[38;2;255;103;103m"; // #FF6767 (same as RED)
+    pub const INFO: &str = "\x1b[38;2;99;209;169m"; // #63D1A9 (same as CYAN)
 
-    // UI Elements
+    // Reset and style
     pub const RESET: &str = "\x1b[0m";
     pub const BOLD: &str = "\x1b[1m";
 
-    // Icons
+    // Status icons with color baked in
     pub const CHECK: &str = "\x1b[38;2;157;255;101m✓\x1b[0m";
     pub const CROSS: &str = "\x1b[38;2;255;103;103m✗\x1b[0m";
     pub const WARN: &str = "\x1b[38;2;255;228;106m⚠\x1b[0m";
     pub const ARROW: &str = "\x1b[38;2;255;113;231m›\x1b[0m";
-    pub const SELECTED: &str = "\x1b[38;2;99;209;169m▸\x1b[0m"; // CYAN
-    pub const BULLET: &str = "\x1b[38;2;99;209;169m●\x1b[0m"; // CYAN
-    pub const STAGED: &str = "\x1b[38;2;157;255;101m●\x1b[0m";
-    pub const MODIFIED: &str = "\x1b[38;2;255;228;106m◎\x1b[0m";
-    pub const DELETED: &str = "\x1b[38;2;255;103;103m◼\x1b[0m";
-    pub const UNTRACKED: &str = "\x1b[38;2;98;114;164m○\x1b[0m";
 
     // Graph symbols
-    pub const GRAPH_COMMIT: &str = "\x1b[38;2;99;209;169m●\x1b[0m";
-    pub const GRAPH_LINE: &str = "\x1b[38;2;99;209;169m│\x1b[0m";
-    pub const GRAPH_BRANCH: &str = "\x1b[38;2;162;119;255m⎇\x1b[0m";
-    pub const GRAPH_ARROW: &str = "\x1b[38;2;255;113;231m→\x1b[0m";
+    pub const BULLET: &str = "\x1b[38;2;99;209;169m●\x1b[0m"; // CYAN
+    pub const LINE: &str = "\x1b[38;2;99;209;169m│\x1b[0m"; // CYAN
+
+    // File status icons
+    pub const STAGED: &str = "\x1b[38;2;157;255;101m●\x1b[0m"; // GREEN
+    pub const MODIFIED: &str = "\x1b[38;2;255;228;106m◎\x1b[0m"; // YELLOW
+    pub const DELETED: &str = "\x1b[38;2;255;103;103m◼\x1b[0m"; // RED
+    pub const UNTRACKED: &str = "\x1b[38;2;98;114;164m○\x1b[0m"; // TEXT_MUTED
 }
 
 /// Print colored text
@@ -56,7 +54,7 @@ pub fn aura_text(text: &str, color: &str) {
     print!("{}{}{}", color, text, aura::RESET);
 }
 
-/// Print bold text
+/// Print bold text with color
 pub fn aura_bold(text: &str, color: &str) {
     print!("{}{}{}{}", aura::BOLD, color, text, aura::RESET);
 }
@@ -183,4 +181,72 @@ pub fn link(url: &str) {
     print!(" ");
     aura_text(url, aura::PURPLE);
     println!();
+}
+
+/// Print section header (smaller than separator)
+pub fn section(title: &str) {
+    print!("  ");
+    aura_bold(title, aura::CYAN);
+    println!();
+}
+
+/// Print bullet point
+pub fn bullet(text: &str) {
+    print!("  ");
+    aura_text(aura::BULLET.trim(), aura::CYAN);
+    print!(" ");
+    aura_text(text, aura::TEXT);
+    println!();
+}
+
+/// Print muted/dim text
+pub fn muted(text: &str) {
+    aura_text(text, aura::TEXT_MUTED);
+}
+
+/// Print inline error text
+pub fn inline_error(text: &str) {
+    aura_text(text, aura::RED);
+}
+
+/// Print inline success text
+pub fn inline_success(text: &str) {
+    aura_text(text, aura::GREEN);
+}
+
+/// Print header title (pink + bold)
+pub fn print_header(title: &str) {
+    println!();
+    aura_bold(title, aura::PINK);
+    println!();
+}
+
+/// Print commit hash in cyan
+pub fn print_hash(hash: &str) {
+    aura_text(hash, aura::CYAN);
+}
+
+/// Print date in muted
+pub fn print_date(date: &str) {
+    aura_text(date, aura::TEXT_MUTED);
+}
+
+/// Print branch refs in purple
+pub fn print_refs(refs: &str) {
+    aura_text(refs, aura::PURPLE);
+}
+
+/// Print message in text color
+pub fn print_message(msg: &str) {
+    aura_text(msg, aura::TEXT);
+}
+
+/// Print graph line
+pub fn graph_line() {
+    aura_text("│", aura::CYAN);
+}
+
+/// Print graph bullet
+pub fn graph_bullet() {
+    aura_text("●", aura::CYAN);
 }

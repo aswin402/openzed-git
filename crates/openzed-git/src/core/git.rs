@@ -392,4 +392,584 @@ impl GitInfo {
 
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     }
+
+    pub fn stash_push(message: &str) -> Result<()> {
+        let output = Command::new("git")
+            .args(["stash", "push", "-m", message])
+            .output()
+            .context("Failed to stash changes")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to stash: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn stash_list() -> Result<Vec<StashEntry>> {
+        let output = Command::new("git")
+            .args(["stash", "list"])
+            .output()
+            .context("Failed to list stashes")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let mut stashes = Vec::new();
+
+        for line in stdout.lines() {
+            if let Some(entry) = StashEntry::parse(line) {
+                stashes.push(entry);
+            }
+        }
+
+        Ok(stashes)
+    }
+
+    pub fn stash_pop(index: usize) -> Result<()> {
+        let stash_ref = format!("stash@{{{}}}", index);
+        let output = Command::new("git")
+            .args(["stash", "pop", &stash_ref])
+            .output()
+            .context("Failed to pop stash")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to pop stash: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn stash_apply(index: usize) -> Result<()> {
+        let stash_ref = format!("stash@{{{}}}", index);
+        let output = Command::new("git")
+            .args(["stash", "apply", &stash_ref])
+            .output()
+            .context("Failed to apply stash")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to apply stash: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn stash_drop(index: usize) -> Result<()> {
+        let stash_ref = format!("stash@{{{}}}", index);
+        let output = Command::new("git")
+            .args(["stash", "drop", &stash_ref])
+            .output()
+            .context("Failed to drop stash")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to drop stash: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn has_changes() -> Result<bool> {
+        let output = Command::new("git")
+            .args(["status", "--porcelain"])
+            .output()
+            .context("Failed to check for changes")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        Ok(!stdout.trim().is_empty())
+    }
+
+    pub fn local_branches() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["branch"])
+            .output()
+            .context("Failed to list local branches")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let branches: Vec<String> = stdout
+            .lines()
+            .map(|l| l.trim().trim_start_matches("* ").to_string())
+            .filter(|b| !b.is_empty())
+            .collect();
+
+        Ok(branches)
+    }
+
+    pub fn remote_branches() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["branch", "-r"])
+            .output()
+            .context("Failed to list remote branches")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let branches: Vec<String> = stdout
+            .lines()
+            .map(|l| l.trim().to_string())
+            .filter(|b| !b.is_empty() && !b.contains("->") && !b.contains("origin/HEAD"))
+            .collect();
+
+        Ok(branches)
+    }
+
+    pub fn branch_exists(name: &str) -> Result<bool> {
+        let output = Command::new("git")
+            .args(["rev-parse", &format!("refs/heads/{}", name)])
+            .output()?;
+
+        Ok(output.status.success())
+    }
+
+    pub fn switch_branch(name: &str) -> Result<()> {
+        let output = Command::new("git")
+            .args(["switch", name])
+            .output()
+            .context("Failed to switch branch")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to switch branch: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn create_and_switch_branch(name: &str) -> Result<()> {
+        let output = Command::new("git")
+            .args(["switch", "-c", name])
+            .output()
+            .context("Failed to create and switch branch")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to create branch: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn checkout_remote_branch(remote_branch: &str) -> Result<()> {
+        // Extract local branch name from remote branch (e.g., "origin/feature" -> "feature")
+        let local_name = remote_branch
+            .split('/')
+            .skip(1)
+            .collect::<Vec<_>>()
+            .join("/");
+
+        let output = Command::new("git")
+            .args(["switch", "--track", remote_branch])
+            .output()
+            .context("Failed to checkout remote branch")?;
+
+        if !output.status.success() {
+            // If it failed, it might be because local branch already exists
+            // Try just switching to it
+            if !local_name.is_empty() {
+                return Self::switch_branch(&local_name);
+            }
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to checkout remote branch: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn last_commit_summary() -> Result<CommitSummary> {
+        let output = Command::new("git")
+            .args([
+                "log",
+                "-1",
+                "--pretty=format:%h%x09%s%x09%ad",
+                "--date=short",
+            ])
+            .output()
+            .context("Failed to get last commit")?;
+
+        if !output.status.success() {
+            anyhow::bail!("Failed to get last commit");
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let parts: Vec<&str> = stdout.splitn(3, '\t').collect();
+
+        if parts.len() >= 3 {
+            Ok(CommitSummary {
+                hash: parts[0].to_string(),
+                message: parts[1].to_string(),
+                date: parts[2].to_string(),
+            })
+        } else if parts.len() == 2 {
+            Ok(CommitSummary {
+                hash: parts[0].to_string(),
+                message: parts[1].to_string(),
+                date: String::new(),
+            })
+        } else {
+            Ok(CommitSummary {
+                hash: parts[0].to_string(),
+                message: parts.get(0).unwrap_or(&" ").to_string(),
+                date: String::new(),
+            })
+        }
+    }
+
+    pub fn undo_last_commit_soft() -> Result<()> {
+        let output = Command::new("git")
+            .args(["reset", "--soft", "HEAD~1"])
+            .output()
+            .context("Failed to undo last commit (soft)")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to undo commit: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn undo_last_commit_mixed() -> Result<()> {
+        let output = Command::new("git")
+            .args(["reset", "--mixed", "HEAD~1"])
+            .output()
+            .context("Failed to undo last commit (mixed)")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to undo commit: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn staged_files() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["diff", "--name-only", "--staged"])
+            .output()
+            .context("Failed to get staged files")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let files: Vec<String> = stdout
+            .lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .collect();
+
+        Ok(files)
+    }
+
+    pub fn unstage_files(files: &[String]) -> Result<()> {
+        for file in files {
+            let output = Command::new("git")
+                .args(["restore", "--staged", file])
+                .output()
+                .context("Failed to unstage file")?;
+
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                anyhow::bail!("Failed to unstage {}: {}", file, stderr.trim())
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn modified_unstaged_files() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["diff", "--name-only"])
+            .output()
+            .context("Failed to get modified files")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let files: Vec<String> = stdout
+            .lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .collect();
+
+        Ok(files)
+    }
+
+    pub fn restore_files(files: &[String]) -> Result<()> {
+        for file in files {
+            let output = Command::new("git")
+                .args(["restore", file])
+                .output()
+                .context("Failed to restore file")?;
+
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                anyhow::bail!("Failed to restore {}: {}", file, stderr.trim())
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn changed_files() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["status", "--porcelain"])
+            .output()
+            .context("Failed to get changed files")?;
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let files: Vec<String> = stdout
+            .lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .map(|l| l[3..].to_string()) // Remove status columns like " M "
+            .collect();
+
+        Ok(files)
+    }
+
+    pub fn stage_files(files: &[String]) -> Result<()> {
+        for file in files {
+            let output = Command::new("git")
+                .args(["add", file])
+                .output()
+                .context("Failed to stage file")?;
+
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                anyhow::bail!("Failed to stage {}: {}", file, stderr.trim())
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn stage_all() -> Result<()> {
+        let output = Command::new("git")
+            .arg("add")
+            .arg(".")
+            .output()
+            .context("Failed to stage all files")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Failed to stage all files: {}", stderr.trim())
+        }
+
+        Ok(())
+    }
+
+    pub fn create_commit(message: &str, body: Option<&str>) -> Result<()> {
+        if body.is_some() {
+            let output = Command::new("git")
+                .args(["commit", "-m", message, "-m", body.unwrap()])
+                .output()
+                .context("Failed to create commit")?;
+
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                anyhow::bail!("Failed to create commit: {}", stderr.trim())
+            }
+        } else {
+            let output = Command::new("git")
+                .args(["commit", "-m", message])
+                .output()
+                .context("Failed to create commit")?;
+
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                anyhow::bail!("Failed to create commit: {}", stderr.trim())
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn last_commit_hash() -> Result<String> {
+        let output = Command::new("git")
+            .args(["rev-parse", "--short", "HEAD"])
+            .output()
+            .context("Failed to get last commit hash")?;
+
+        if !output.status.success() {
+            anyhow::bail!("Failed to get last commit hash")
+        }
+
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    }
+
+    pub fn conflicted_files() -> Result<Vec<String>> {
+        let output = Command::new("git")
+            .args(["diff", "--name-only", "--diff-filter=U"])
+            .output()
+            .context("Failed to get conflicted files")?;
+
+        if !output.status.success() {
+            return Ok(Vec::new());
+        }
+
+        let files = String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        Ok(files)
+    }
+
+    pub fn has_merge_in_progress() -> bool {
+        let output = Command::new("git")
+            .args(["rev-parse", "MERGE_HEAD"])
+            .output();
+
+        output.map(|o| o.status.success()).unwrap_or(false)
+    }
+
+    pub fn has_rebase_in_progress() -> bool {
+        // Check for rebase-merge or rebase-apply directories
+        std::path::Path::new(".git/rebase-merge").exists()
+            || std::path::Path::new(".git/rebase-apply").exists()
+    }
+
+    pub fn mark_resolved(files: &[String]) -> Result<()> {
+        for file in files {
+            Command::new("git")
+                .args(["add", file])
+                .output()
+                .context(format!("Failed to stage file: {}", file))?;
+        }
+        Ok(())
+    }
+
+    pub fn continue_merge() -> Result<()> {
+        Command::new("git")
+            .args(["merge", "--continue"])
+            .output()
+            .context("Failed to continue merge")?;
+
+        Ok(())
+    }
+
+    pub fn abort_merge() -> Result<()> {
+        Command::new("git")
+            .args(["merge", "--abort"])
+            .output()
+            .context("Failed to abort merge")?;
+
+        Ok(())
+    }
+
+    pub fn continue_rebase() -> Result<()> {
+        Command::new("git")
+            .args(["rebase", "--continue"])
+            .output()
+            .context("Failed to continue rebase")?;
+
+        Ok(())
+    }
+
+    pub fn skip_rebase() -> Result<()> {
+        Command::new("git")
+            .args(["rebase", "--skip"])
+            .output()
+            .context("Failed to skip commit during rebase")?;
+        Ok(())
+    }
+
+    pub fn abort_rebase() -> Result<()> {
+        Command::new("git")
+            .args(["rebase", "--abort"])
+            .output()
+            .context("Failed to abort rebase")?;
+        Ok(())
+    }
+
+    pub fn open_in_zed(files: &[String]) -> Result<()> {
+        for file in files {
+            let output = Command::new("zed").arg(file).output();
+
+            if output.is_err() {
+                anyhow::bail!("Failed to open zed for file: {}", file);
+            }
+        }
+        Ok(())
+    }
+
+    pub fn zed_available() -> bool {
+        Command::new("zed")
+            .arg("--version")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum GitState {
+    Clean,
+    MergeInProgress,
+    RebaseInProgress,
+    Conflicts,
+}
+
+#[derive(Debug, Clone)]
+pub struct CommitSummary {
+    pub hash: String,
+    pub message: String,
+    pub date: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct StashEntry {
+    pub index: usize,
+    pub branch: String,
+    pub message: String,
+}
+
+impl StashEntry {
+    fn parse(line: &str) -> Option<Self> {
+        // Format: stash@{0}: WIP on <branch>: <hash> <message>
+        // Or: stash@{0}: On <branch>: <message>
+
+        let line = line.trim();
+        if !line.starts_with("stash@") {
+            return None;
+        }
+
+        // Extract index
+        let index_start = line.find("{")? + 1;
+        let index_end = line.find("}")?;
+        let index_str = &line[index_start..index_end];
+        let index: usize = index_str.parse().ok()?;
+
+        // Extract branch and message
+        // Find the colon after the index
+        let after_index = &line[index_end + 1..];
+        let colon_pos = after_index.find(':')?;
+
+        let rest = &after_index[colon_pos + 1..].trim();
+
+        // Try to extract branch from patterns like "WIP on main:" or "On main:"
+        let (branch, message) = if rest.starts_with("WIP on ") {
+            let after_wip = &rest[7..];
+            if let Some(colon) = after_wip.find(':') {
+                let branch = after_wip[..colon].to_string();
+                let message = after_wip[colon + 1..].trim().to_string();
+                (branch, message)
+            } else {
+                (String::from("unknown"), rest.to_string())
+            }
+        } else if rest.starts_with("On ") {
+            let after_on = &rest[3..];
+            if let Some(colon) = after_on.find(':') {
+                let branch = after_on[..colon].to_string();
+                let message = after_on[colon + 1..].trim().to_string();
+                (branch, message)
+            } else {
+                (after_on.to_string(), String::new())
+            }
+        } else {
+            (String::from("unknown"), rest.to_string())
+        };
+
+        Some(Self {
+            index,
+            branch,
+            message,
+        })
+    }
 }

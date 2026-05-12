@@ -1,7 +1,7 @@
 use crate::core::git::GitInfo;
 use crate::core::shell::confirm;
-use crate::ui::aura::separator;
 use crate::ui::aura::aura::CHECK;
+use crate::ui::aura::separator;
 use crate::ui::prompts::input;
 use anyhow::Result;
 

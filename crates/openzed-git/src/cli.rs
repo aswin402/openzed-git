@@ -44,4 +44,36 @@ pub enum Commands {
     OpenGithub,
     /// Install OpenZed Git tasks in Zed
     InstallZedTasks,
+    /// Manage Git stashes
+    Stash,
+    /// Switch branches interactively
+    Switch,
+    /// Undo last commit safely
+    UndoLastCommit,
+    /// Unstage files
+    Unstage,
+    /// Restore files to last commit
+    RestoreFile,
+    /// Guided conventional commit assistant
+    Commit,
+    /// Create a pull request on GitHub
+    PrCreate,
+    /// List open pull requests
+    PrList,
+    /// Checkout a pull request locally
+    PrCheckout,
+    /// Open a pull request in browser
+    PrOpen,
+    /// Help resolve merge conflicts
+    Conflicts,
+    /// Help with Git rebase operations
+    RebaseHelper,
+    /// Open interactive menu
+    Menu,
+    /// Manage configuration
+    Config,
+    /// Manage themes
+    Theme,
+    /// Install Zed keybindings
+    InstallKeybindings,
 }

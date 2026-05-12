@@ -1,6 +1,6 @@
 use crate::core::{parser::ZedTasks, paths, tasks};
-use crate::ui::aura::separator;
 use crate::ui::aura::aura::CHECK;
+use crate::ui::aura::separator;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
