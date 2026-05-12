@@ -1,6 +1,8 @@
 use crate::core::git::GitInfo;
 use crate::core::shell::confirm;
-use crate::ui::{colors::*, output::separator, prompts::input_with_default};
+use crate::ui::aura::aura::{CHECK, WARNING};
+use crate::ui::aura::separator;
+use crate::ui::prompts::input_with_default;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -16,8 +18,7 @@ pub fn run() -> Result<()> {
     }
 
     let current_branch = info.current_branch.unwrap_or_else(|| "main".to_string());
-    let upstream_branch: String =
-        input_with_default("Remote branch name:", &current_branch)?;
+    let upstream_branch: String = input_with_default("Remote branch name:", &current_branch)?;
 
     // Confirm
     println!();

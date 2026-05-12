@@ -1,6 +1,8 @@
 use crate::core::git::GitInfo;
 use crate::core::shell::confirm;
-use crate::ui::{colors::*, output::separator, prompts::input};
+use crate::ui::aura::separator;
+use crate::ui::aura::aura::CHECK;
+use crate::ui::prompts::input;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {

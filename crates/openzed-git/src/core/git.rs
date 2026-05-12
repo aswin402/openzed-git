@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use anyhow::{Context, Result};
 use std::process::Command;
 
@@ -224,6 +226,36 @@ impl GitInfo {
             .context("Failed to get git log")?;
 
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    }
+
+    pub fn log_simple() -> Result<String> {
+        let output = Command::new("git")
+            .args(["log", "--oneline", "-15", "--decorate", "--date=relative"])
+            .output()
+            .context("Failed to get git log")?;
+
+        if !output.status.success() {
+            return Ok("No commits yet".to_string());
+        }
+
+        let output = String::from_utf8_lossy(&output.stdout);
+
+        let lines: Vec<&str> = output.lines().collect();
+        if lines.is_empty() {
+            return Ok("No commits yet".to_string());
+        }
+
+        let mut result = String::new();
+
+        for (i, line) in lines.iter().enumerate() {
+            if i == 0 {
+                result.push_str(&format!("  \x1b[38;2;0;255;135m•\x1b[0m {}\n", line));
+            } else {
+                result.push_str(&format!("  \x1b[38;2;80;80;80m│\x1b[0m {}\n", line));
+            }
+        }
+
+        Ok(result.trim_end().to_string())
     }
 
     pub fn branches() -> Result<String> {

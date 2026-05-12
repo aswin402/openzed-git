@@ -1,5 +1,6 @@
 use crate::core::git::GitInfo;
-use crate::ui::{colors::*, output::separator};
+use crate::ui::aura::separator;
+use crate::ui::aura::aura::WARNING;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {

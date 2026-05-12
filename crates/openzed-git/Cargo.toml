@@ -1,6 +1,6 @@
 [package]
 name = "openzed-git"
-version = "0.6.0"
+version = "0.8.0"
 edition = "2021"
 description = "Extra Git tools for Zed through a Rust CLI and Zed Tasks integration."
 license = "MIT"

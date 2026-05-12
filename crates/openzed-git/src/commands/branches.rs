@@ -1,5 +1,5 @@
 use crate::core::git::GitInfo;
-use crate::ui::output::separator;
+use crate::ui::aura::separator;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {

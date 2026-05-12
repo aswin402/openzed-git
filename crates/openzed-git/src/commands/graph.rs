@@ -1,11 +1,11 @@
 use crate::core::git::GitInfo;
-use crate::ui::output::separator;
+use crate::ui::aura::separator;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
     separator("OpenZed Git: Git Graph");
 
-    let graph = GitInfo::log_graph()?;
+    let graph = GitInfo::log_simple()?;
     println!("{}", graph);
 
     Ok(())

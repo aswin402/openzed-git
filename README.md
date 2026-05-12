@@ -1,5 +1,9 @@
 # OpenZed Git
 
+<p align="center">
+  <img src="assets/logo.png" alt="OpenZed Git Logo" width="600"/>
+</p>
+
 **Extra Git tools for Zed — not a replacement, an enhancement.**
 
 OpenZed Git adds missing Git features to Zed through a Rust CLI and Zed Tasks integration. It does NOT replace Zed's built-in Git panel.

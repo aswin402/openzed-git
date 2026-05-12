@@ -3,10 +3,10 @@ mod commands;
 mod core;
 mod ui;
 
+use crate::ui::banner::show_banner;
 use anyhow::Result;
 use clap::Parser;
 use cli::Cli;
-use ui::banner::show_banner;
 
 fn main() {
     if let Err(e) = run() {
