@@ -48,10 +48,8 @@ pub fn run() -> Result<()> {
 
     // Check if there are staged files
     let status = GitInfo::status()?;
-    let has_staged = status.lines().any(|line| {
-        line.len() >= 2
-            && line.chars().next().unwrap_or(' ') != ' '
-            && line.chars().next().unwrap_or(' ') != '?'
+    let has_staged = status.lines().skip(1).any(|line| {
+        !line.starts_with("??") && line.chars().nth(1).map_or(false, |c| c != ' ')
     });
 
     if !has_staged {

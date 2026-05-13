@@ -153,3 +153,180 @@ Git state: Clean
 
 ---
 
+## 2026-05-13 17:21:47
+
+| Field | Value |
+|---|---|
+| Command | `openzed-git` |
+| Error Type | Unknown Error |
+| Title | Unknown error occurred |
+| Suggested Fix | `None` |
+
+### Message
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+```
+
+### Raw Error
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+```
+
+### Context
+
+```text
+Current directory: /home/aswin/programming/vscode/myProjects/openzed-git
+Git branch: main
+Git state: Clean
+```
+
+---
+
+## 2026-05-13 17:22:11
+
+| Field | Value |
+|---|---|
+| Command | `openzed-git` |
+| Error Type | Git Error |
+| Title | Git command failed |
+| Suggested Fix | `Check git status for more information.` |
+
+### Message
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." ...
+```
+
+### Raw Error
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .openzed-git/gitlogerror.md
+	modified:   Cargo.lock
+	modified:   crates/openzed-git/Cargo.toml
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### Context
+
+```text
+Current directory: /home/aswin/programming/vscode/myProjects/openzed-git
+Git branch: main
+Git state: Clean
+```
+
+---
+
+## 2026-05-13 17:23:55
+
+| Field | Value |
+|---|---|
+| Command | `openzed-git` |
+| Error Type | Git Error |
+| Title | Git command failed |
+| Suggested Fix | `Check git status for more information.` |
+
+### Message
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." ...
+```
+
+### Raw Error
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .openzed-git/gitlogerror.md
+	modified:   Cargo.lock
+	modified:   crates/openzed-git/Cargo.toml
+	modified:   crates/openzed-git/src/commands/commit_push.rs
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### Context
+
+```text
+Current directory: /home/aswin/programming/vscode/myProjects/openzed-git
+Git branch: main
+Git state: Clean
+```
+
+---
+
+## 2026-05-13 17:25:36
+
+| Field | Value |
+|---|---|
+| Command | `openzed-git` |
+| Error Type | Git Error |
+| Title | Git command failed |
+| Suggested Fix | `Check git status for more information.` |
+
+### Message
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." ...
+```
+
+### Raw Error
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .openzed-git/gitlogerror.md
+	modified:   Cargo.lock
+	modified:   crates/openzed-git/Cargo.toml
+	modified:   crates/openzed-git/src/commands/commit_push.rs
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### Context
+
+```text
+Current directory: /home/aswin/programming/vscode/myProjects/openzed-git
+Git branch: main
+Git state: Clean
+```
+
+---
+
