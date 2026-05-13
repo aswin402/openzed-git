@@ -43,10 +43,7 @@ pub fn run() -> Result<()> {
     if body.is_empty() {
         GitInfo::commit(&message)?;
     } else {
-        // Use git commit -m message -m body
-        std::process::Command::new("git")
-            .args(["commit", "-m", &message, "-m", &body])
-            .output()?;
+        GitInfo::create_commit(&message, Some(&body))?;
     }
     println!("{}", CHECK);
 

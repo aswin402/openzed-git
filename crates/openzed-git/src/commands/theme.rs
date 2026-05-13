@@ -2,6 +2,7 @@ use crate::core::config::{global_config_path, load_config};
 use crate::ui::aura::aura::{ARROW, CYAN, PINK, PURPLE, TEXT, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_bold, aura_print, aura_text, error_msg, link, success, warning_msg};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 
 /// Theme definition
@@ -40,13 +41,16 @@ pub fn run() -> Result<()> {
         aura_text("What do you want to do?", TEXT);
         println!();
 
-        let choices = ["List themes", "Preview theme", "Set theme", "Cancel"];
-
-        let selection = dialoguer::Select::new()
-            .with_prompt("Select an option")
-            .items(&choices)
-            .default(0)
-            .interact()?;
+        let selection = select_with_default(
+            "Select an option",
+            &[
+                "List themes",
+                "Preview theme",
+                "Set theme",
+                "Cancel",
+            ],
+            0,
+        )?;
 
         match selection {
             0 => list_themes()?,
@@ -64,12 +68,9 @@ pub fn run() -> Result<()> {
 
         // Ask if user wants to continue
         println!();
-        let continue_menu = dialoguer::Confirm::new()
-            .with_prompt("Return to theme menu?")
-            .default(true)
-            .interact()?;
+        use crate::core::shell::confirm;
 
-        if !continue_menu {
+        if !confirm("Return to theme menu?")? {
             break;
         }
     }
@@ -101,11 +102,11 @@ fn preview_theme() -> Result<()> {
 
     let theme_names: Vec<&str> = THEMES.iter().map(|t| t.name).collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Which theme?")
-        .items(&theme_names)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Which theme?",
+        &theme_names,
+        0,
+    )?;
 
     let selected = THEMES[selection].name;
 
@@ -160,11 +161,11 @@ fn set_theme() -> Result<()> {
 
     let theme_names: Vec<&str> = THEMES.iter().map(|t| t.name).collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Which theme?")
-        .items(&theme_names)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Which theme?",
+        &theme_names,
+        0,
+    )?;
 
     let selected = THEMES[selection].name;
 

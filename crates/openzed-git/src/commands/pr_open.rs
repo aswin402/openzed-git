@@ -2,7 +2,9 @@ use crate::core::git::GitInfo;
 use crate::core::github::GithubInfo;
 use crate::ui::aura::aura::{CHECK, GREEN, PURPLE, TEXT_MUTED};
 use crate::ui::aura::separator;
+use crate::core::shell::confirm;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -32,8 +34,7 @@ pub fn run() -> Result<()> {
             aura_text(&url, PURPLE);
             println!();
 
-            let open = confirm("Open in browser?")?;
-            if !open {
+            if !confirm("Open in browser?")? {
                 println!();
                 print!("  ");
                 aura_text("Cancelled.", TEXT_MUTED);
@@ -100,11 +101,11 @@ fn list_and_open_prs() -> Result<()> {
         .map(|pr| format!("#{}  {}  →  {}", pr.number, pr.title, pr.base))
         .collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Select PR to open:")
-        .items(&pr_labels)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Select PR to open:",
+        &pr_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let selected = &prs[selection];
 
@@ -128,9 +129,4 @@ fn list_and_open_prs() -> Result<()> {
     Ok(())
 }
 
-fn confirm(prompt: &str) -> Result<bool> {
-    Ok(dialoguer::Confirm::new()
-        .with_prompt(prompt)
-        .default(true)
-        .interact()?)
-}
+

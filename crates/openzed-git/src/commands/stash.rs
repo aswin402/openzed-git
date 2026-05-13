@@ -3,7 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, PURPLE, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
-use crate::ui::prompts::input_with_default;
+use crate::ui::prompts::{input_with_default, select_with_default};
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -37,20 +37,18 @@ pub fn run() -> Result<()> {
     aura_text("Current changes detected.", CYAN);
     println!();
 
-    let choices = [
-        "Save stash",
-        "List stashes",
-        "Apply stash",
-        "Pop latest stash",
-        "Drop stash",
-        "Cancel",
-    ];
-
-    let selection = dialoguer::Select::new()
-        .with_prompt("What do you want to do?")
-        .items(&choices)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "What do you want to do?",
+        &[
+            "Save stash",
+            "List stashes",
+            "Apply stash",
+            "Pop latest stash",
+            "Drop stash",
+            "Cancel",
+        ],
+        0,
+    )?;
 
     match selection {
         0 => save_stash()?,
@@ -147,11 +145,11 @@ fn apply_stash() -> Result<()> {
         .map(|s| format!("stash@{{{}}}: {} on {}", s.index, s.message, s.branch))
         .collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Which stash?")
-        .items(&stash_labels)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Which stash?",
+        &stash_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let stash = &stashes[selection];
 
@@ -252,11 +250,11 @@ fn drop_stash() -> Result<()> {
         .map(|s| format!("stash@{{{}}}: {} on {}", s.index, s.message, s.branch))
         .collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Which stash?")
-        .items(&stash_labels)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Which stash?",
+        &stash_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let stash = &stashes[selection];
 

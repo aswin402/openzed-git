@@ -3,6 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -52,17 +53,15 @@ pub fn run() -> Result<()> {
     println!();
 
     // Ask for undo type
-    let choices = [
-        "Soft reset - keep changes staged",
-        "Mixed reset - keep changes unstaged",
-        "Cancel",
-    ];
-
-    let selection = dialoguer::Select::new()
-        .with_prompt("Choose undo type:")
-        .items(&choices)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Choose undo type:",
+        &[
+            "Soft reset - keep changes staged",
+            "Mixed reset - keep changes unstaged",
+            "Cancel",
+        ],
+        0,
+    )?;
 
     match selection {
         0 => soft_reset()?,

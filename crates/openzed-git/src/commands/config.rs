@@ -6,6 +6,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CYAN, TEXT, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, labeled_value, success, warning_msg};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 use std::process::Command;
 
@@ -17,21 +18,19 @@ pub fn run() -> Result<()> {
         aura_text("What do you want to do?", TEXT);
         println!();
 
-        let choices = [
-            "Show current config",
-            "Create global config",
-            "Create project config",
-            "Edit global config",
-            "Edit project config",
-            "Reset global config",
-            "Cancel",
-        ];
-
-        let selection = dialoguer::Select::new()
-            .with_prompt("Select an option")
-            .items(&choices)
-            .default(0)
-            .interact()?;
+        let selection = select_with_default(
+            "Select an option",
+            &[
+                "Show current config",
+                "Create global config",
+                "Create project config",
+                "Edit global config",
+                "Edit project config",
+                "Reset global config",
+                "Cancel",
+            ],
+            0,
+        )?;
 
         match selection {
             0 => show_config()?,
@@ -52,12 +51,7 @@ pub fn run() -> Result<()> {
 
         // Ask if user wants to continue
         println!();
-        let continue_menu = dialoguer::Confirm::new()
-            .with_prompt("Return to config menu?")
-            .default(true)
-            .interact()?;
-
-        if !continue_menu {
+        if !confirm("Return to config menu?")? {
             break;
         }
     }

@@ -3,6 +3,7 @@ use crate::core::git::GitInfo;
 use crate::ui::aura::aura::{CYAN, TEXT, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -25,29 +26,27 @@ pub fn run() -> Result<()> {
         aura_text("What do you want to do?", TEXT);
         println!();
 
-        let choices = [
-            "Status+",
-            "Git Graph",
-            "Commit",
-            "Commit + Push",
-            "Stash",
-            "Switch Branch",
-            "Pull",
-            "Push",
-            "Pull Requests",
-            "Conflict Helper",
-            "Rebase Helper",
-            "Config",
-            "Theme",
-            "Doctor",
-            "Cancel",
-        ];
-
-        let selection = dialoguer::Select::new()
-            .with_prompt("Select an option")
-            .items(&choices)
-            .default(0)
-            .interact()?;
+        let selection = select_with_default(
+            "Select an option",
+            &[
+                "Status+",
+                "Git Graph",
+                "Commit",
+                "Commit + Push",
+                "Stash",
+                "Switch Branch",
+                "Pull",
+                "Push",
+                "Pull Requests",
+                "Conflict Helper",
+                "Rebase Helper",
+                "Config",
+                "Theme",
+                "Doctor",
+                "Cancel",
+            ],
+            0,
+        )?;
 
         match selection {
             0 => {
@@ -154,13 +153,11 @@ fn pull_requests_menu() -> Result<()> {
         aura_text("Pull Requests", CYAN);
         println!();
 
-        let choices = ["Create PR", "List PRs", "Checkout PR", "Open PR", "Back"];
-
-        let selection = dialoguer::Select::new()
-            .with_prompt("Select an option")
-            .items(&choices)
-            .default(0)
-            .interact()?;
+        let selection = select_with_default(
+            "Select an option",
+            &["Create PR", "List PRs", "Checkout PR", "Open PR", "Back"],
+            0,
+        )?;
 
         match selection {
             0 => {

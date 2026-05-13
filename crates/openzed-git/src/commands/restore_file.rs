@@ -3,6 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
+use crate::ui::prompts::multiselect;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -36,10 +37,10 @@ pub fn run() -> Result<()> {
     aura_text("Modified files:", TEXT_MUTED);
     println!();
 
-    let selections = dialoguer::MultiSelect::new()
-        .with_prompt("Select files to restore (space to select, enter to confirm)")
-        .items(&files)
-        .interact()?;
+    let selections = multiselect(
+        "Select files to restore (space to select, enter to confirm)",
+        &files,
+    )?;
 
     if selections.is_empty() {
         println!();

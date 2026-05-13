@@ -4,29 +4,42 @@ OpenZed Git uses Zed Tasks to provide Git helper workflows.
 
 ## How It Works
 
-1. OpenZed Git extension provides tasks in `tasks.json`
+1. Tasks are installed via `openzed-git install-zed-tasks`
 2. When user runs `task: spawn`, Zed shows available tasks
 3. User selects an OpenZed Git task
-4. Zed opens terminal and runs the `openzed-git` CLI command
-5. The Rust binary executes the Git workflow
+4. Zed **opens a new terminal** with TTY support and runs the command
+5. Interactive commands work because the new terminal has a proper TTY attached
+
+## Why Use Zed Tasks?
+
+| Running Direct | Via Zed Tasks |
+|---------------|---------------|
+| Interactive commands need a terminal with TTY | ✅ All commands work (Zed opens new terminal) |
+| May fail in scripts, CI, or piped commands | ✅ Works because TTY is available |
+| Clear error message if no TTY: "Interactive input requires a terminal" | ✅ Works correctly |
 
 ## Tasks Provided
 
-The extension provides these tasks (also available as CLI commands):
+All these tasks open a **new terminal**, so interactive commands work:
 
-- `OpenZed Git: Publish to GitHub` - Publish local repo to GitHub
+**Non-Interactive (always work):**
+- `OpenZed Git: Doctor` - Check Git setup
 - `OpenZed Git: Git Graph` - Show commit history
-- `OpenZed Git: Status+` - Show enhanced git status
-- `OpenZed Git: Commit + Push` - Guided commit and push
-- `OpenZed Git: Push / Set Upstream` - Push with upstream setup
-- `OpenZed Git: Pull` - Pull from remote
+- `OpenZed Git: Status+` - Enhanced git status
 - `OpenZed Git: Branches` - List branches
 - `OpenZed Git: Remotes` - List remotes
-- `OpenZed Git: Setup Remote` - Add remote origin
-- `OpenZed Git: Rename Branch` - Rename current branch
-- `OpenZed Git: Set Upstream` - Set upstream branch
-- `OpenZed Git: Open GitHub Repo` - Open repo in browser
-- `OpenZed Git: Doctor` - Check Git setup
+
+**Interactive (work via Zed Tasks with new terminal):**
+- `OpenZed Git: Publish to GitHub` - Create and push repo
+- `OpenZed Git: Commit + Push` - Guided commit and push
+- `OpenZed Git: Commit Assistant` - Conventional commit helper
+- `OpenZed Git: Menu` - Interactive main menu
+- `OpenZed Git: Stash` - Save/list/apply stashes
+- `OpenZed Git: Branch Switcher` - Switch/create branches
+- `OpenZed Git: Conflict Helper` - Resolve merge conflicts
+- `OpenZed Git: Rebase Helper` - Help with rebases
+- `OpenZed Git: Config` - Manage configuration
+- `OpenZed Git: Theme` - Theme management
 
 ## Installation
 

@@ -3,6 +3,7 @@
 use anyhow::{Context, Result};
 use std::process::Command;
 
+/// Wrapper for dialoguer operations that handles non-terminal environments
 pub fn run(command: &str, args: &[&str]) -> Result<String> {
     let output = Command::new(command).args(args).output().context(format!(
         "Failed to run {} {}",
@@ -32,7 +33,8 @@ pub fn confirm(prompt: &str) -> Result<bool> {
     let confirmed = dialoguer::Confirm::new()
         .with_prompt(prompt)
         .default(false)
-        .interact()?;
+        .interact()
+        .map_err(|e| anyhow::anyhow!("Interactive input failed: {}. Run this command in a terminal.", e))?;
 
     Ok(confirmed)
 }

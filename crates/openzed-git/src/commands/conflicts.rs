@@ -3,6 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{ARROW, CHECK, CYAN, GREEN, PINK, PURPLE, TEXT, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_print, aura_text, error_msg, success, warning_msg};
+use crate::ui::prompts::{multiselect, select_with_default};
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -53,20 +54,18 @@ pub fn run() -> Result<()> {
     println!();
 
     // Show menu
-    let choices = [
-        "Open conflicted files in Zed",
-        "Show resolution steps",
-        "Mark selected files as resolved",
-        "Continue merge",
-        "Abort merge",
-        "Cancel",
-    ];
-
-    let selection = dialoguer::Select::new()
-        .with_prompt("What do you want to do?")
-        .items(&choices)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "What do you want to do?",
+        &[
+            "Open conflicted files in Zed",
+            "Show resolution steps",
+            "Mark selected files as resolved",
+            "Continue merge",
+            "Abort merge",
+            "Cancel",
+        ],
+        0,
+    )?;
 
     match selection {
         0 => open_conflicted_files(&conflicted)?,
@@ -155,10 +154,10 @@ fn mark_resolved(all_files: &[String]) -> Result<()> {
         return Ok(());
     }
 
-    let selections = dialoguer::MultiSelect::new()
-        .with_prompt("Select files (space to toggle, enter to confirm)")
-        .items(all_files)
-        .interact()?;
+    let selections = multiselect(
+        "Select files (space to toggle, enter to confirm)",
+        all_files,
+    )?;
 
     if selections.is_empty() {
         print!("  ");

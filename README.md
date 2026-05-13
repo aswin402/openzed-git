@@ -35,29 +35,38 @@ OpenZed Git adds missing Git features to Zed through a Rust CLI and Zed Tasks in
 | `theme` | ✅ Done | Theme listing and preview |
 | `install-keybindings` | ✅ Done | Install Zed keybindings |
 
-## Quick Start
+## Usage
 
-### 1. Clone and Build
+### In Zed (Recommended)
 
-```bash
-git clone <your-repo-url>
-cd openzed-git
-bash update.sh
-```
-
-### 2. Use in Zed
+OpenZed Git is designed to work **within Zed's terminal** using Tasks:
 
 1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
 2. Type `task: spawn`
-3. Select a task, e.g. `OpenZed Git: Publish to GitHub`
+3. Select a task, e.g. `OpenZed Git: Commit + Push`
 
-Or use directly from terminal:
+All interactive commands work via Zed Tasks because Zed opens a **new terminal** with proper TTY support.
+
+### From Terminal
 
 ```bash
-openzed-git doctor      # Check your setup
-openzed-git publish     # Publish to GitHub
-openzed-git graph       # View commit history
+# Non-interactive commands (work anywhere)
+openzed-git doctor        # Check your setup
+openzed-git graph        # View commit history
+openzed-git status-plus  # Enhanced git status
+openzed-git branches     # List branches
+
+# Interactive commands (require terminal with TTY)
+openzed-git commit        # Guided commit assistant
+openzed-git commit-push  # Commit and push
+openzed-git publish      # Publish to GitHub
+openzed-git menu         # Interactive menu
+
+# ⚠️ Without a terminal: interactive commands show:
+# "Interactive input requires a terminal. Run this command in a terminal."
 ```
+
+> **Note:** Interactive commands need a terminal with TTY. When running directly from a non-interactive shell, use Zed Tasks instead.
 
 ## Installation
 

@@ -4,7 +4,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CROSS, CYAN, GREEN, RED, TEXT_DIM, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, link, success, warning_msg};
-use crate::ui::prompts::input_with_default;
+use crate::ui::prompts::{input_with_default, select_with_default};
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -108,11 +108,7 @@ pub fn run() -> Result<()> {
     let name: String = input_with_default("Repository name:", &default_name)?;
     let description: String = input_with_default("Description (optional):", "")?;
 
-    let visibility = dialoguer::Select::new()
-        .with_prompt("Visibility")
-        .items(&["public", "private"])
-        .default(0)
-        .interact()?;
+    let visibility = select_with_default("Visibility", &["public", "private"], 0)?;
 
     let public = visibility == 0;
 
@@ -123,11 +119,11 @@ pub fn run() -> Result<()> {
         print!("    ");
         aura_text(&info.remote_origin.as_ref().unwrap(), TEXT_DIM);
         println!();
-        let choice = dialoguer::Select::new()
-            .with_prompt("What do you want to do?")
-            .items(&["Use existing remote and push", "Cancel"])
-            .default(1)
-            .interact()?;
+        let choice = select_with_default(
+            "What do you want to do?",
+            &["Use existing remote and push", "Cancel"],
+            1,
+        )?;
 
         if choice == 1 {
             print!("  ");

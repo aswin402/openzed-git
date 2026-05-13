@@ -3,7 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, PURPLE, TEXT, TEXT_MUTED, YELLOW};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
-use crate::ui::prompts::input;
+use crate::ui::prompts::{input, multiselect, select_with_default};
 use anyhow::Result;
 
 const COMMIT_TYPES: &[(&str, &str)] = &[
@@ -52,16 +52,16 @@ pub fn run() -> Result<()> {
 
     // Stage files menu
     println!();
-    let staging_choice = dialoguer::Select::new()
-        .with_prompt("What do you want to stage?")
-        .items(&[
+    let staging_choice = select_with_default(
+        "What do you want to stage?",
+        &[
             "Select files",
             "Stage all files",
             "Use already staged files",
             "Cancel",
-        ])
-        .default(0)
-        .interact()?;
+        ],
+        0,
+    )?;
 
     let staged_files: Vec<String>;
 
@@ -72,10 +72,10 @@ pub fn run() -> Result<()> {
             aura_text("Select files to stage:", TEXT_MUTED);
             println!();
 
-            let selections = dialoguer::MultiSelect::new()
-                .with_prompt("Select files (space to select, enter to confirm)")
-                .items(&changed)
-                .interact()?;
+            let selections = multiselect(
+                "Select files (space to select, enter to confirm)",
+                &changed,
+            )?;
 
             if selections.is_empty() {
                 println!();
@@ -148,11 +148,11 @@ pub fn run() -> Result<()> {
         .map(|(t, desc)| format!("{} - {}", t, desc))
         .collect();
 
-    let type_selection = dialoguer::Select::new()
-        .with_prompt("Select commit type:")
-        .items(&type_labels)
-        .default(0)
-        .interact()?;
+    let type_selection = select_with_default(
+        "Select commit type:",
+        &type_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let commit_type = COMMIT_TYPES[type_selection].0;
 
@@ -171,16 +171,8 @@ pub fn run() -> Result<()> {
 
     // Ask for commit summary
     println!();
-    let summary = match input("Commit summary:") {
-        Ok(s) => s.trim().to_string(),
-        Err(_) => {
-            println!();
-            print!("  ");
-            aura_text("Cancelled.", TEXT_MUTED);
-            println!();
-            return Ok(());
-        }
-    };
+    let summary = input("Commit summary:")?;
+    let summary = summary.trim().to_string();
 
     if summary.is_empty() {
         error_msg("Commit summary cannot be empty.");
@@ -203,7 +195,7 @@ pub fn run() -> Result<()> {
     println!();
     let add_body = confirm("Add commit body?")?;
     let body = if add_body {
-        let body_input: String = input("Commit body:").unwrap_or_default().trim().to_string();
+        let body_input: String = input("Commit body:")?.trim().to_string();
         if body_input.is_empty() {
             None
         } else {

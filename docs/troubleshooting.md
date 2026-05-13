@@ -17,6 +17,42 @@ cp target/release/openzed-git ~/.local/bin/
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
+### "Interactive input requires a terminal"
+
+When running commands like `commit`, `commit-push`, `menu`, or `publish` directly in a non-interactive shell (e.g., scripts, CI, piping), you may see:
+
+```
+Interactive input requires a terminal. Run this command in a terminal.
+```
+
+**Solution:**
+
+**Option 1: Use Zed Tasks (Recommended)**
+```bash
+# Run via Zed Tasks - Zed opens a new terminal with TTY
+# 1. Open Command Palette (Cmd+Shift+P)
+# 2. Type "task: spawn"
+# 3. Select an OpenZed Git task
+```
+
+**Option 2: Use non-interactive commands directly**
+```bash
+# These commands don't need a terminal:
+openzed-git graph        # View commit history
+openzed-git doctor       # Check setup
+openzed-git status-plus  # Enhanced status
+openzed-git branches     # List branches
+openzed-git push         # Push (no prompts)
+openzed-git pull         # Pull (no prompts)
+```
+
+**Option 3: Stage and commit separately**
+```bash
+git add .
+git commit -m "Your message"
+openzed-git push
+```
+
 ### Tasks not appearing in Zed
 
 **Fix:**

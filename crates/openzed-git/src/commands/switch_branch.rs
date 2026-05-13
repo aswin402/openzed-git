@@ -3,7 +3,7 @@ use crate::core::shell::confirm;
 use crate::ui::aura::aura::{CHECK, CYAN, GREEN, TEXT_MUTED};
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
-use crate::ui::prompts::input;
+use crate::ui::prompts::{input, select_with_default};
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -45,18 +45,16 @@ pub fn run() -> Result<()> {
 
     // Main menu
     println!();
-    let choices = [
-        "Switch branch",
-        "Create new branch",
-        "Checkout remote branch",
-        "Cancel",
-    ];
-
-    let selection = dialoguer::Select::new()
-        .with_prompt("What do you want to do?")
-        .items(&choices)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "What do you want to do?",
+        &[
+            "Switch branch",
+            "Create new branch",
+            "Checkout remote branch",
+            "Cancel",
+        ],
+        0,
+    )?;
 
     match selection {
         0 => switch_branch(&current_branch, has_changes)?,
@@ -95,11 +93,11 @@ fn switch_branch(current: &str, has_changes: bool) -> Result<()> {
         })
         .collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Select a branch to switch to:")
-        .items(&branch_labels)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Select a branch to switch to:",
+        &branch_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let selected = &branches[selection];
 
@@ -237,11 +235,11 @@ fn checkout_remote(_current: &str, has_changes: bool) -> Result<()> {
         })
         .collect();
 
-    let selection = dialoguer::Select::new()
-        .with_prompt("Select a remote branch to checkout:")
-        .items(&branch_labels)
-        .default(0)
-        .interact()?;
+    let selection = select_with_default(
+        "Select a remote branch to checkout:",
+        &branch_labels.iter().map(|s| s.as_str()).collect::<Vec<_>>(),
+        0,
+    )?;
 
     let selected = &remote_branches[selection];
 

@@ -1,7 +1,9 @@
 use crate::core::config::{suggested_keybindings, zed_keymap_path};
 use crate::ui::aura::aura::{CYAN, TEXT, TEXT_MUTED};
+use crate::core::shell::confirm;
 use crate::ui::aura::separator;
 use crate::ui::aura::{aura_text, error_msg, success, warning_msg};
+use crate::ui::prompts::select_with_default;
 use anyhow::Result;
 
 pub fn run() -> Result<()> {
@@ -21,19 +23,17 @@ pub fn run() -> Result<()> {
         aura_text("Keybindings file exists. What would you like to do?", TEXT);
         println!();
 
-        let choices = [
-            "Show suggested keybindings",
-            "Append safely to keymap",
-            "Print snippet only",
-            "View current keymap",
-            "Cancel",
-        ];
-
-        let selection = dialoguer::Select::new()
-            .with_prompt("Select an option")
-            .items(&choices)
-            .default(0)
-            .interact()?;
+        let selection = select_with_default(
+            "Select an option",
+            &[
+                "Show suggested keybindings",
+                "Append safely to keymap",
+                "Print snippet only",
+                "View current keymap",
+                "Cancel",
+            ],
+            0,
+        )?;
 
         match selection {
             0 => show_suggested()?,
@@ -53,12 +53,7 @@ pub fn run() -> Result<()> {
         warning_msg("Keymap file does not exist.");
         println!();
 
-        let create = dialoguer::Confirm::new()
-            .with_prompt("Create keymap.json with suggested keybindings?")
-            .default(false)
-            .interact()?;
-
-        if create {
+        if confirm("Create keymap.json with suggested keybindings?")? {
             create_keymap(&keymap_path)?;
         } else {
             println!();
