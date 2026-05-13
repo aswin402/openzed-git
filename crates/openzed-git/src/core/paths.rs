@@ -25,17 +25,8 @@ pub fn default_zed_tasks_path() -> std::path::PathBuf {
         .join("tasks.json")
 }
 
-/// Get project-specific log directory (.openzed-git in current dir or git root)
+/// Get project-specific log directory (.openzed-git in current dir)
+/// Returns project path only if we're in a git repo
 pub fn project_log_dir() -> std::path::PathBuf {
-    // Check if we're in a git repo
-    let git_repo = std::path::Path::new(".git");
-    if git_repo.exists() {
-        return std::path::PathBuf::from(".openzed-git");
-    }
-
-    // Fallback to global config dir
-    let home = std::env::var("HOME").unwrap_or_default();
-    std::path::PathBuf::from(home)
-        .join(".config")
-        .join("openzed-git")
+    std::path::PathBuf::from(".openzed-git")
 }

@@ -76,4 +76,6 @@ pub enum Commands {
     Theme,
     /// Install Zed keybindings
     InstallKeybindings,
+    /// View error logs
+    Log,
 }

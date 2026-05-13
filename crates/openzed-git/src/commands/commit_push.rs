@@ -1,9 +1,45 @@
 use crate::core::git::GitInfo;
-use crate::core::shell::confirm;
 use crate::ui::aura::aura::CHECK;
 use crate::ui::aura::separator;
-use crate::ui::prompts::input_with_default;
 use anyhow::Result;
+
+fn is_interactive() -> bool {
+    atty::is(atty::Stream::Stdin)
+}
+
+fn ask_yes_no(prompt: &str) -> bool {
+    if is_interactive() {
+        crate::core::shell::confirm(prompt).unwrap_or(false)
+    } else {
+        false
+    }
+}
+
+fn ask_commit_message() -> String {
+    if is_interactive() {
+        crate::ui::prompts::input_with_default("Commit message:", "Update changes")
+            .unwrap_or_else(|_| "Update changes".to_string())
+    } else {
+        "Update changes".to_string()
+    }
+}
+
+fn ask_commit_body() -> Option<String> {
+    if is_interactive() {
+        let body = crate::ui::prompts::input_with_default(
+            "Commit body (optional, press Enter to skip):",
+            "",
+        )
+        .unwrap_or_default();
+        if body.is_empty() {
+            None
+        } else {
+            Some(body)
+        }
+    } else {
+        None
+    }
+}
 
 pub fn run() -> Result<()> {
     separator("OpenZed Git: Commit + Push");
@@ -21,29 +57,35 @@ pub fn run() -> Result<()> {
     if !has_staged {
         println!();
         println!("  No staged files found.");
-        let stage_all = confirm("Stage all changes?")?;
-        if stage_all {
+        if is_interactive() {
+            let stage_all = ask_yes_no("Stage all changes?");
+            if stage_all {
+                GitInfo::add_all()?;
+                println!("  {} All changes staged", CHECK);
+            } else {
+                println!("  Cancelled.");
+                return Ok(());
+            }
+        } else {
+            println!("  Auto-staging all changes (non-interactive mode)...");
             GitInfo::add_all()?;
             println!("  {} All changes staged", CHECK);
-        } else {
-            println!("  Cancelled.");
-            return Ok(());
         }
     }
 
     // Get commit message
     println!();
-    let message: String = input_with_default("Commit message:", "Update changes")?;
+    let message = ask_commit_message();
 
-    // Optional body
-    let body: String = input_with_default("Commit body (optional, press Enter to skip):", "")?;
+    // Optional body (interactive only)
+    let body = ask_commit_body();
 
     // Commit
     print!("  Committing... ");
-    if body.is_empty() {
-        GitInfo::commit(&message)?;
+    if body.is_some() {
+        GitInfo::create_commit(&message, body.as_deref())?;
     } else {
-        GitInfo::create_commit(&message, Some(&body))?;
+        GitInfo::commit(&message)?;
     }
     println!("{}", CHECK);
 
@@ -52,9 +94,15 @@ pub fn run() -> Result<()> {
 
     if upstream.is_some() {
         println!();
-        let push = confirm("Push commit now?")?;
-        if push {
-            print!("  Pushing... ");
+        if is_interactive() {
+            let push = ask_yes_no("Push commit now?");
+            if push {
+                print!("  Pushing... ");
+                GitInfo::push()?;
+                println!("{}", CHECK);
+            }
+        } else {
+            print!("  Pushing to {}... ", upstream.as_ref().unwrap());
             GitInfo::push()?;
             println!("{}", CHECK);
         }
@@ -62,12 +110,18 @@ pub fn run() -> Result<()> {
         let current_branch = info.current_branch.unwrap_or_else(|| "main".to_string());
         println!();
         println!("  No upstream branch found.");
-        let set_upstream = confirm(&format!(
-            "Push and set upstream to origin/{}?",
-            current_branch
-        ))?;
-        if set_upstream {
-            print!("  Pushing with upstream... ");
+        if is_interactive() {
+            let set_upstream = ask_yes_no(&format!(
+                "Push and set upstream to origin/{}?",
+                current_branch
+            ));
+            if set_upstream {
+                print!("  Pushing with upstream... ");
+                GitInfo::push_u("origin", &current_branch)?;
+                println!("{}", CHECK);
+            }
+        } else {
+            print!("  Pushing with upstream to origin/{}... ", current_branch);
             GitInfo::push_u("origin", &current_branch)?;
             println!("{}", CHECK);
         }

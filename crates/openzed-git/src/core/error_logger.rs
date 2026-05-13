@@ -44,8 +44,9 @@ pub fn collect_error_context() -> ErrorContext {
     }
 }
 
-/// Get error log path - prefer .openzed-git/gitlogerror.md in project, fallback to global
+/// Get error log path - project level only (.openzed-git/gitlogerror.md)
 pub fn error_log_path() -> Result<PathBuf> {
+    // Only log to project level if in a git repo
     let log_dir = project_log_dir();
 
     // Ensure directory exists

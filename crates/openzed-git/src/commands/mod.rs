@@ -9,6 +9,7 @@ pub mod conflicts;
 pub mod doctor;
 pub mod graph;
 pub mod install_keybindings;
+pub mod log;
 pub mod install_zed_tasks;
 pub mod menu;
 pub mod open_github;
@@ -64,5 +65,6 @@ pub fn execute(cmd: Commands) -> Result<()> {
         Commands::Config => config::run(),
         Commands::Theme => theme::run(),
         Commands::InstallKeybindings => install_keybindings::run(),
+        Commands::Log => log::run(),
     }
 }

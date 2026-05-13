@@ -89,5 +89,124 @@
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Stash",
+    "command": "openzed-git stash",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Switch Branch",
+    "command": "openzed-git switch",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Undo Last Commit",
+    "command": "openzed-git undo-last-commit",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Unstage Files",
+    "command": "openzed-git unstage",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Restore File",
+    "command": "openzed-git restore-file",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Commit Assistant",
+    "command": "openzed-git commit",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Create PR",
+    "command": "openzed-git pr-create",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: List PRs",
+    "command": "openzed-git pr-list",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Checkout PR",
+    "command": "openzed-git pr-checkout",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Open PR in Browser",
+    "command": "openzed-git pr-open",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Conflicts",
+    "command": "openzed-git conflicts",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Rebase Helper",
+    "command": "openzed-git rebase-helper",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Menu",
+    "command": "openzed-git menu",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Config",
+    "command": "openzed-git config",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Theme",
+    "command": "openzed-git theme",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Install Keybindings",
+    "command": "openzed-git install-keybindings",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "OpenZed Git: Install Tasks",
+    "command": "openzed-git install-zed-tasks",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
   }
 ]

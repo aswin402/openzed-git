@@ -140,10 +140,15 @@ impl GitInfo {
     }
 
     pub fn commit(message: &str) -> Result<()> {
-        Command::new("git")
+        let output = Command::new("git")
             .args(["commit", "-m", message])
             .output()
             .context("Failed to commit")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Commit failed: {}", stderr);
+        }
 
         Ok(())
     }
@@ -158,19 +163,29 @@ impl GitInfo {
     }
 
     pub fn push_u(origin: &str, branch: &str) -> Result<()> {
-        Command::new("git")
+        let output = Command::new("git")
             .args(["push", "-u", origin, branch])
             .output()
             .context("Failed to push and set upstream")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Push failed: {}", stderr);
+        }
 
         Ok(())
     }
 
     pub fn push() -> Result<()> {
-        Command::new("git")
+        let output = Command::new("git")
             .arg("push")
             .output()
             .context("Failed to push")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            anyhow::bail!("Push failed: {}", stderr);
+        }
 
         Ok(())
     }
