@@ -330,3 +330,47 @@ Git state: Clean
 
 ---
 
+## 2026-05-13 17:35:58
+
+| Field | Value |
+|---|---|
+| Command | `openzed-git` |
+| Error Type | Git Error |
+| Title | Git command failed |
+| Suggested Fix | `Check git status for more information.` |
+
+### Message
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." ...
+```
+
+### Raw Error
+
+```text
+Commit failed: On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   test-file.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### Context
+
+```text
+Current directory: /home/aswin/programming/vscode/myProjects/openzed-git
+Git branch: main
+Git state: Clean
+```
+
+---
+
