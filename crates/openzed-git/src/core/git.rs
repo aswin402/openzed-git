@@ -147,7 +147,9 @@ impl GitInfo {
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            anyhow::bail!("Commit failed: {}", stderr);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let error_msg = if stderr.is_empty() { stdout.as_ref() } else { stderr.as_ref() };
+            anyhow::bail!("Commit failed: {}", error_msg.trim());
         }
 
         Ok(())
